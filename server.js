@@ -1,17 +1,18 @@
 import express from "express";
 import axios from "axios";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const app = express();
-const port = 3000;
 
-app.set("view engine", "ejs");
+// IMPORTANT for Vercel
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+// Serve static files
 app.use(express.static("public"));
 
-const API_KEY = process.env.API_KEY;
+// Set EJS
+app.set("view engine", "ejs");
+app.set("views", "./views");
 
 // Home route
 app.get("/", (req, res) => {
@@ -26,7 +27,7 @@ app.post("/check", async (req, res) => {
     const response = await axios.get("https://api.openuv.io/api/v1/uv", {
       params: { lat, lng },
       headers: {
-        "x-access-token": API_KEY,
+        "x-access-token": process.env.API_KEY,
       },
     });
 
@@ -69,13 +70,10 @@ app.post("/check", async (req, res) => {
     });
 
   } catch (error) {
-    console.log(error.message);
-    res.render("index", {
-      data: null,
-      error: "❌ Failed to fetch UV data. Check API or inputs.",
-    });
+    console.log("ERROR:", error.message);
+    res.status(500).send("Error: " + error.message);
   }
 });
 
-// Start server
+// ❗ IMPORTANT FOR VERCEL
 export default app;
