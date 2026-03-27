@@ -78,6 +78,4 @@ app.post("/check", async (req, res) => {
 });
 
 // Start server
-app.listen(port, () => {
-  console.log(`🚀 Server running at http://localhost:${port}`);
-});
+export default app;
