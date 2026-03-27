@@ -1,25 +1,28 @@
 import express from "express";
 import axios from "axios";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
 
-// IMPORTANT for Vercel
+// Fix dirname for Vercel
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
 
-// Serve static files
-app.use(express.static("public"));
-
-// Set EJS
+// View engine
 app.set("view engine", "ejs");
-app.set("views", "./views");
+app.set("views", path.join(__dirname, "views"));
 
-// Home route
+// Routes
 app.get("/", (req, res) => {
   res.render("index", { data: null, error: null });
 });
 
-// Form route
 app.post("/check", async (req, res) => {
   const { lat, lng } = req.body;
 
@@ -71,9 +74,9 @@ app.post("/check", async (req, res) => {
 
   } catch (error) {
     console.log("ERROR:", error.message);
-    res.status(500).send("Error: " + error.message);
+    res.status(500).send("Internal Server Error: " + error.message);
   }
 });
 
-// ❗ IMPORTANT FOR VERCEL
+// Vercel export
 export default app;
